@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  mongodb
+  namespace: default
+  labels:
+    app:  mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app:  mongodb
+    spec:
+    
+      containers:
+      - name:  mongodb
+        image:  mongo:4.4.3
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: mongo_username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+             secretKeyRef:
+              name: mysecret
+              key: mongo_password
+        - name: MONGO_INITDB_DATABASE
+          valueFrom:
+             secretKeyRef:
+              name: mysecret
+              key: admin
+        ports:
+        - containerPort: 27017
+          name: mangodb
+        
